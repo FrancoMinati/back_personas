@@ -49,6 +49,7 @@ public class PersonaServiceImpl extends BaseServiceImpl<Persona, PersonaDto, Lon
     }
 
     public AltaPersonaDto altaCompleta(AltaPersonaDto altaPersonaDto) {
+        
         return null;
     }
 }

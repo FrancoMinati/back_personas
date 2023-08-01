@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "api/v1/personas")
 public class PersonaController extends BaseControllerImpl<Persona, PersonaDto, PersonaServiceImpl>{
 
-    @PostMapping
+    @PostMapping("/alta-completa")
     public ResponseEntity<?> altaCompleta(@RequestParam AltaPersonaDto altaPersonaDto) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(servicio.altaCompleta(altaPersonaDto));
