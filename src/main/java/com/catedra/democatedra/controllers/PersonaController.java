@@ -1,6 +1,5 @@
 package com.catedra.democatedra.controllers;
 
-import com.catedra.democatedra.dtos.AltaPersonaDto;
 import com.catedra.democatedra.dtos.PersonaDto;
 import com.catedra.democatedra.entities.Persona;
 import com.catedra.democatedra.services.PersonaServiceImpl;
@@ -13,16 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/personas")
 public class PersonaController extends BaseControllerImpl<Persona, PersonaDto, PersonaServiceImpl>{
-
-    @PostMapping("/alta-completa")
-    public ResponseEntity<?> altaCompleta(@RequestParam AltaPersonaDto altaPersonaDto) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(servicio.altaCompleta(altaPersonaDto));
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\":\"Error, por favor intente mas tarde.\"}");
-        }
-    }
-
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam String filtro) {
         try {

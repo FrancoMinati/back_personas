@@ -1,6 +1,5 @@
 package com.catedra.democatedra.services;
 
-import com.catedra.democatedra.dtos.AltaPersonaDto;
 import com.catedra.democatedra.dtos.PersonaDto;
 import com.catedra.democatedra.entities.Persona;
 import com.catedra.democatedra.exceptions.ServicioException;
@@ -48,8 +47,4 @@ public class PersonaServiceImpl extends BaseServiceImpl<Persona, PersonaDto, Lon
         }
     }
 
-    public AltaPersonaDto altaCompleta(AltaPersonaDto altaPersonaDto) {
-        
-        return null;
-    }
 }
