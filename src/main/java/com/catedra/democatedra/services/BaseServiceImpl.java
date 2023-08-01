@@ -1,7 +1,9 @@
 package com.catedra.democatedra.services;
 
+import com.catedra.democatedra.dtos.BaseDto;
 import com.catedra.democatedra.entities.Base;
-import com.catedra.democatedra.entities.Persona;
+import com.catedra.democatedra.exceptions.ServicioException;
+import com.catedra.democatedra.mappers.BaseMapper;
 import com.catedra.democatedra.repositories.BaseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -11,19 +13,22 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseServiceImpl<E extends Base, ID extends Serializable> implements BaseService<E, ID> {
+public abstract class BaseServiceImpl<E extends Base, D extends BaseDto, ID extends Serializable> implements BaseService<E, D, ID> {
     protected BaseRepository<E,ID> baseRepository;
 
-    public BaseServiceImpl(BaseRepository<E, ID> baseRepository) {
+    protected BaseMapper<E, D> baseMapper;
+
+    public BaseServiceImpl(BaseRepository<E, ID> baseRepository, BaseMapper<E, D> baseMapper) {
         this.baseRepository = baseRepository;
+        this.baseMapper = baseMapper;
     }
 
     @Override
     @Transactional
-    public List<E> findALL() throws Exception {
+    public List<D> findALL() throws Exception {
         try {
             List<E> entities = baseRepository.findAll();
-            return entities;
+            return baseMapper.toDTOsList(entities);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -31,10 +36,10 @@ public abstract class BaseServiceImpl<E extends Base, ID extends Serializable> i
 
     @Override
     @Transactional
-    public Page<E> findALL(Pageable pageable) throws Exception {
+    public Page<D> findALL(Pageable pageable) throws Exception {
         try {
             Page<E> entities = baseRepository.findAll(pageable);
-            return entities;
+            return entities.map(baseMapper::toDTO);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -42,10 +47,14 @@ public abstract class BaseServiceImpl<E extends Base, ID extends Serializable> i
 
     @Override
     @Transactional
-    public E findById(ID id) throws Exception {
+    public D findById(ID id) throws Exception {
         try{
             Optional<E> entityOptional = baseRepository.findById(id);
-            return entityOptional.get();
+            if(entityOptional.isEmpty()) {
+                throw new ServicioException("No se encontro la entidad con el id dado.");
+            }
+
+            return baseMapper.toDTO(entityOptional.get());
         } catch (Exception e){
             throw new Exception(e.getMessage());
         }
@@ -53,10 +62,10 @@ public abstract class BaseServiceImpl<E extends Base, ID extends Serializable> i
 
     @Override
     @Transactional
-    public E save(E entity) throws Exception {
+    public D save(D dto) throws Exception {
         try{
-            entity = baseRepository.save(entity);
-            return entity;
+            E entity = baseRepository.save(baseMapper.toEntity(dto));
+            return baseMapper.toDTO(entity);
         } catch (Exception e){
             throw new Exception(e.getMessage());
         }
@@ -64,14 +73,24 @@ public abstract class BaseServiceImpl<E extends Base, ID extends Serializable> i
 
     @Override
     @Transactional
-    public E update(ID id, E entity) throws Exception {
+    public D update(ID id, D dto) throws ServicioException {
         try{
+            if (dto.getId() == null) {
+                throw new ServicioException("La entidad a modificar debe contener un Id.");
+            } else if(!id.equals(dto.getId())){
+                throw new ServicioException("El id enviado como parametro y el id de la entidad deben coincidir.");
+            }
+
             Optional<E> entityOptional = baseRepository.findById(id);
-            E entityUpdate = entityOptional.get();
-            entityUpdate = baseRepository.save(entity);
-            return entityUpdate;
+
+            if(entityOptional.isEmpty()) {
+                throw new ServicioException("No se encontro la entidad con el id dado.");
+            }
+
+            E entityUpdate = baseRepository.save(baseMapper.toEntity(dto));
+            return baseMapper.toDTO(entityUpdate);
         } catch (Exception e){
-            throw new Exception(e.getMessage());
+            throw new ServicioException(e.getMessage());
         }
     }
 

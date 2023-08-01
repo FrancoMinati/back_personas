@@ -1,9 +1,7 @@
 package com.catedra.democatedra.controllers;
 
-import com.catedra.democatedra.controllers.BaseController;
+import com.catedra.democatedra.dtos.BaseDto;
 import com.catedra.democatedra.entities.Base;
-
-
 import com.catedra.democatedra.services.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -11,12 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
-
-public abstract class BaseControllerImpl<E extends Base, S extends BaseServiceImpl<E,Long>> implements BaseController<E, Long> {
+public abstract class BaseControllerImpl<E extends Base, D extends BaseDto, S extends BaseServiceImpl<E, D, Long>> implements BaseController<E, D, Long> {
     @Autowired
     protected S servicio;
-
 
     @GetMapping("")
     public ResponseEntity<?> getAll() {
@@ -47,19 +42,19 @@ public abstract class BaseControllerImpl<E extends Base, S extends BaseServiceIm
     }
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody E entity){
+    public ResponseEntity<?> save(@RequestBody D dto){
         try {
             System.out.println("Post");
-            return ResponseEntity.status(HttpStatus.OK).body(servicio.save(entity));
+            return ResponseEntity.status(HttpStatus.OK).body(servicio.save(dto));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\":\"Error, por favor intente mas tarde.\"}");
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody E entity){
+    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody D dto){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(servicio.update(id,entity));
+            return ResponseEntity.status(HttpStatus.OK).body(servicio.update(id, dto));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\":\"Error, por favor intente mas tarde.\"}");
         }

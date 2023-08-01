@@ -1,10 +1,13 @@
 package com.catedra.democatedra.services;
 
+import com.catedra.democatedra.dtos.AltaPersonaDto;
+import com.catedra.democatedra.dtos.PersonaDto;
 import com.catedra.democatedra.entities.Persona;
+import com.catedra.democatedra.exceptions.ServicioException;
+import com.catedra.democatedra.mappers.BaseMapper;
+import com.catedra.democatedra.mappers.PersonaMapper;
 import com.catedra.democatedra.repositories.BaseRepository;
 import com.catedra.democatedra.repositories.PersonaRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,42 +15,40 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PersonaServiceImpl extends BaseServiceImpl<Persona, Long> implements PersonaService {
+public class PersonaServiceImpl extends BaseServiceImpl<Persona, PersonaDto, Long> implements PersonaService {
 
-    @Autowired
     private PersonaRepository personaRepository;
 
-    public PersonaServiceImpl(BaseRepository<Persona, Long> baseRepository, PersonaRepository personaRepository) {
-        super(baseRepository);
+    private PersonaMapper personaMapper;
+
+    public PersonaServiceImpl(BaseRepository<Persona, Long> baseRepository, BaseMapper<Persona, PersonaDto> baseMapper, PersonaRepository personaRepository, PersonaMapper personaMapper) {
+        super(baseRepository, baseMapper);
+        this.personaMapper = personaMapper;
         this.personaRepository = personaRepository;
     }
 
     @Override
-    public List<Persona> search(String filtro) throws Exception {
-
+    public List<PersonaDto> search(String filtro) throws ServicioException {
         try {
-
-            //List<Persona> personas = personaRepository.findByNombreContainingOrApellidoContaining(filtro, filtro);
             List<Persona> personas = personaRepository.search(filtro);
-            //List<Persona> personas = personaRepository.searchNativo(filtro);
 
-            return personas;
+            return baseMapper.toDTOsList(personas);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new ServicioException(e.getMessage());
         }
     }
 
     @Override
-    public Page<Persona> search(String filtro, Pageable pageable) throws Exception {
-
+    public Page<PersonaDto> search(String filtro, Pageable pageable) throws ServicioException {
         try {
-            //Page<Persona> personas = personaRepository.findByNombreContainingOrApellidoContaining(filtro, filtro, pageable);
             Page<Persona> personas = personaRepository.search(filtro, pageable);
-            //Page<Persona> personas = personaRepository.searchNativo(filtro, pageable);
-
-            return personas;
+            return personas.map(baseMapper::toDTO);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new ServicioException(e.getMessage());
         }
+    }
+
+    public AltaPersonaDto altaCompleta(AltaPersonaDto altaPersonaDto) {
+        return null;
     }
 }

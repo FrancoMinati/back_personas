@@ -1,10 +1,8 @@
 package com.catedra.democatedra.repositories;
 
 import com.catedra.democatedra.entities.Persona;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
